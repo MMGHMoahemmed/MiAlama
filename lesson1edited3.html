@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiAlama Student App - Unit 1 Demo (Dabdoub & Dabdouba)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 95%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 600px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background-color: #76c7c0;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5em;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .lesson-title {
+            font-weight: bold;
+        }
+
+        .screen {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .pandas-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+            position: absolute;
+            bottom: 70px; /* Space for navigation */
+            left: 0;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .panda {
+            width: 100px;
+            height: 120px;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .panda:hover {
+            transform: scale(1.1);
+        }
+        .panda img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 5px;
+        }
+        .panda-name {
+            font-weight: bold;
+            font-size: 0.9em;
+            background-color: rgba(255,255,255,0.7);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        #dabdoub-panda .panda-name::before { content: "🐼 "; }
+        #dabdouba-panda .panda-name::before { content: "🐼 "; }
+
+
+        .content-area {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        .content-video, .content-image {
+            max-width: 90%;
+            max-height: 570px;
+            margin: 15px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #000;
+        }
+
+
+        .interactive-button, .nav-button { /* Removed .unmute-button from this group */
+            background-color: #ffb347;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.2s;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+        }
+        .interactive-button:hover, .nav-button:hover {
+            background-color: #ff9f1c;
+        }
+        /* Removed .unmute-button specific styles */
+
+        .navigation {
+            padding: 15px;
+            background-color: #f0f0f0;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .learning-pod-item {
+            width: 80px;
+            height: 80px;
+            background-color: #e0e0e0;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        .learning-pod-item:hover {
+            background-color: #d0d0d0;
+        }
+
+        .dance-buttons button { margin: 5px; }
+
+        .speech-bubble {
+            position: absolute;
+            background: #fff;
+            border-radius: .4em;
+            padding: 10px;
+            font-size: 0.9em;
+            min-width: 80px;
+            max-width: 150px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .dabdoub-speech { bottom: 200px; left: calc(25% - 50px); }
+        .dabdouba-speech { bottom: 200px; right: calc(25% - 50px); }
+
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-top-color: #fff;
+            border-bottom: 0;
+            margin-left: -10px;
+            margin-bottom: -10px;
+        }
+        .audio-player {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            كوكب <span class="mi-alama-name">مِعلامة</span> - <span id="lesson-title-display" class="lesson-title"></span>
+        </div>
+
+        <!-- Unmute button removed -->
+
+        <div class="screen" id="main-screen">
+            <div id="segment-content" class="content-area"></div>
+            <div id="interactive-area"></div>
+        </div>
+
+        <div class="pandas-container">
+            <div class="panda" id="dabdoub-panda">
+                <img src="./img/Dabdoub.png" alt="Dabdoub Panda">
+                <div class="panda-name">دبدوب</div>
+                <audio id="dabdoub-audio" class="audio-player"></audio>
+            </div>
+            <div class="panda" id="dabdouba-panda">
+                <img src="./img/Dabdouba.png" alt="Dabdouba Panda">
+                <div class="panda-name">دبدوبة</div>
+                <audio id="dabdouba-audio" class="audio-player"></audio>
+            </div>
+        </div>
+         <div id="dabdouba-speech-bubble" class="speech-bubble dabdoub-speech hidden"></div>
+         <div id="dabdoub-speech-bubble" class="speech-bubble dabdouba-speech hidden"></div>
+
+        <div class="navigation">
+            <button id="next-button" class="nav-button">التالي »</button>
+        </div>
+    </div>
+
+    <script>
+        const unit1Data = {
+            unit_title_ar: "الوحدة الأولى: هيا نبدأ رحلتنا التعليمية!",
+            lessons: [
+                {
+                    lesson_id: "1-1",
+                    lesson_title_ar: "اليوم الأول: هيا نتعارف ونستكشف!",
+                    segments: [
+                        {
+                            type: "video",
+                            title: "مرحباً بك في كوكب مِعلامة!",
+                            pandaScript: [
+                                { panda: "dabdoub", text: "مرحباً! أنا دبدوب!", audioSrc: "./audio/dabdoub_l1_s1_1.wav" },
+                                { panda: "dabdouba", text: "وأنا دبدوبة!", audioSrc: "./audio/dabdouba_l1_s1_1.wav" },
+                                { panda: "dabdoub", text: "أهلاً بك في كوكبنا الممتع، كوكب مِعلامة!", audioSrc: "./audio/dabdoub_l1_s1_2.wav" },
+                                { panda: "dabdouba", text: "نحن سعداء جداً لأنك هنا! سنتعلم ونلعب معاً!", audioSrc: "./audio/dabdouba_l1_s1_2.wav" }
+                            ],
+                            videoSrc: "./videos/lesson1_seg1_intro.mp4",
+                            placeholderVisual: "https://via.placeholder.com/300x200/87CEEB/FFFFFF?text=MiAlama+Planet+Video",
+                            playScriptAfterVideo: false
+                        },
+                        {
+                            type: "activity",
+                            title: "لنتعرف على دبدوب ودبدوبة",
+                            instruction: "انقر على الباندا لتسمع اسمه!",
+                            interaction: "tapPandas",
+                            pandaTaps: [
+                                { panda: "dabdoub", text: "أنا دبدوب!", audioSrc: "./audio/dabdoub_name.wav" },
+                                { panda: "dabdouba", text: "أنا دبدوبة!", audioSrc: "./audio/dabdouba_name.wav" }
+                            ]
+                        },
+                        {
+                            type: "video",
+                            title: "مكاننا الخاص للتعلم!",
+                            pandaScript: [
+                                { panda: "dabdouba", text: "انظر! هذا هو مكاننا الخاص للتعلم والمرح في مِعلامة!", audioSrc: "./audio/dabdouba_l1_s2_1.wav" },
+                                { panda: "dabdoub", text: "هنا لدينا ألوان جميلة، وقصص ممتعة!", audioSrc: "./audio/dabdoub_l1_s2_1.wav" }
+                            ],
+                            videoSrc: "./videos/lesson1_seg2_learningpod.mp4",
+                            placeholderVisual: "https://via.placeholder.com/300x200/FFDAB9/8B4513?text=Learning+Pod+Video"
+                        },
+                        {
+                            type: "game",
+                            title: "مستكشف ركن التعلم",
+                            instruction: "انقر على الأشياء لتتعرف عليها!",
+                            items: [
+                                { name: "كتاب", id: "book", message: "كتاب! نقرأ فيه قصصاً!", audioSrc: "./audio/item_book.wav"},
+                                { name: "ألوان", id: "crayons", message: "ألوان! نرسم بها!", audioSrc: "./audio/item_crayons.wav" },
+                                { name: "نبتة ودودة", id: "plant", message: "نبتة صديقة وودودة!", audioSrc: "./audio/item_plant.wav" }
+                            ],
+                            placeholderVisual: "./img/learningSpace.png"
+                        },
+                        {
+                            type: "video",
+                            title: "غنِّ معنا: هيا هيا!",
+                            pandaScript: [
+                                { panda: "dabdoub", text: "لدينا أنشودة جميلة!", audioSrc: "./audio/dabdoub_l1_s3_intro1.mp3" },
+                                { panda: "dabdouba", text: "هيا نغنيها معاً!", audioSrc: "./audio/dabdouba_l1_s3_intro2.mp3" }
+                            ],
+                            lyrics: "هيا هيا يا صديقي،<br>هيا نلعب هيا نمرح،<br>هيا نرسم هيا نفرح،<br>هيا هيا يا صديقي!",
+                            songAudioSrc: "./audio/song_hayahaya.wav",
+                            placeholderVisual: "https://via.placeholder.com/300x200/f8c471/000000?text=Haya+Haya+Song+Video"
+                        },
+                        {
+                            type: "game",
+                            title: "حفلة رقص الباندا!",
+                            instruction: "اجعل الباندا يرقصون!",
+                            actions: [
+                                { name: "صفق", id: "clap", pandaAnim: "dabdoubClap", audioSrc: "./audio/action_clap.mp3" },
+                                { name: "اقفز", id: "jump", pandaAnim: "dabdoubaJump", audioSrc: "./audio/action_jump.mp3" },
+                                { name: "دُر", id: "spin", pandaAnim: "dabdoubSpin", audioSrc: "./audio/action_spin.mp3" }
+                            ]
+                        },
+                        {
+                            type: "endLesson",
+                            message: "أحسنت! لقد أكملت الدرس الأول بنجاح!",
+                            audioSrc: "./audio/lesson_complete.wav",
+                            placeholderVisual: "./img/lessonCompleted.png"
+                        }
+                    ]
+                },
+            ]
+        };
+
+        let currentLessonIndex = 0;
+        let currentSegmentIndex = 0;
+        let audioEnabled = true; // << CHANGED: Audio attempts to be enabled by default
+        let currentVideoElement = null;
+
+        const lessonTitleDisplay = document.getElementById('lesson-title-display');
+        const segmentContent = document.getElementById('segment-content');
+        const interactiveArea = document.getElementById('interactive-area');
+        const nextButton = document.getElementById('next-button');
+        const dabdoubPandaDiv = document.getElementById('dabdoub-panda');
+        const dabdoubaPandaDiv = document.getElementById('dabdouba-panda');
+        const dabdoubSpeechBubble = document.getElementById('dabdoub-speech-bubble');
+        const dabdoubaSpeechBubble = document.getElementById('dabdouba-speech-bubble');
+        const dabdoubAudio = document.getElementById('dabdoub-audio');
+        const dabdoubaAudio = document.getElementById('dabdouba-audio');
+        // Unmute button element reference removed
+
+        // setupUnmuteButton function removed
+
+        function showPandaSpeech(panda, text, audioSrc) {
+            const bubble = (panda === 'dabdoub') ? dabdoubSpeechBubble : dabdoubaSpeechBubble;
+            const otherBubble = (panda === 'dabdoub') ? dabdoubaSpeechBubble : dabdoubSpeechBubble;
+            const pandaAudioEl = (panda === 'dabdoub') ? dabdoubAudio : dabdoubaAudio;
+            
+            bubble.textContent = text;
+            bubble.classList.remove('hidden');
+            otherBubble.classList.add('hidden');
+
+            const pandaDiv = (panda === 'dabdoub') ? dabdoubPandaDiv : dabdoubaPandaDiv;
+            pandaDiv.style.transform = 'scale(1.1) translateY(-5px)';
+            setTimeout(() => {
+                pandaDiv.style.transform = 'scale(1)';
+            }, 300);
+
+            if (audioSrc) { // audioEnabled is true by default, so we primarily check for audioSrc
+                pandaAudioEl.src = audioSrc;
+                pandaAudioEl.play().catch(e => console.warn("Panda audio play failed for " + panda + " (browser policy might be blocking):", e));
+            }
+
+            let bubbleDuration = 2500; 
+            if (audioSrc) {
+                bubbleDuration = 4000; 
+            }
+            
+            setTimeout(() => {
+                if (bubble.textContent === text) {
+                     bubble.classList.add('hidden');
+                }
+            }, bubbleDuration); 
+        }
+        
+        async function playPandaScript(script) {
+            if (!script || script.length === 0) return;
+            nextButton.disabled = true;
+            for (const line of script) {
+                showPandaSpeech(line.panda, line.text, line.audioSrc);
+                
+                let delay = 2800; 
+                if (line.audioSrc) { // Assuming audio will attempt to play
+                    delay = 4300; 
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            nextButton.disabled = false;
+        }
+
+
+        function loadSegment() {
+            segmentContent.innerHTML = '';
+            interactiveArea.innerHTML = '';
+            dabdoubSpeechBubble.classList.add('hidden');
+            dabdoubaSpeechBubble.classList.add('hidden');
+            dabdoubPandaDiv.onclick = null; 
+            dabdoubaPandaDiv.onclick = null;
+            if (currentVideoElement) { 
+                currentVideoElement.onended = null; 
+                currentVideoElement.pause();
+                currentVideoElement = null;
+            }
+            nextButton.disabled = false;
+
+
+            const lesson = unit1Data.lessons[currentLessonIndex];
+            const segment = lesson.segments[currentSegmentIndex];
+
+            lessonTitleDisplay.textContent = lesson.lesson_title_ar;
+
+            let html = `<h3>${segment.title}</h3>`;
+
+            if (segment.type === "video") {
+                const videoEl = document.createElement('video');
+                videoEl.src = segment.videoSrc;
+                videoEl.poster = segment.placeholderVisual;
+                videoEl.classList.add('content-video');
+                videoEl.autoplay = true; 
+                videoEl.muted = false; // << CHANGED: Attempt to play unmuted
+                videoEl.playsInline = false;
+                //videoEl.setAttribute('controls', 'controls'); // << CHANGED: Always show controls
+                videoEl.style="pointer-events: none;"
+                segmentContent.innerHTML = html; 
+                segmentContent.appendChild(videoEl);
+                currentVideoElement = videoEl;
+
+                videoEl.loop = true; 
+
+                if (segment.pandaScript && segment.pandaScript.length > 0) {
+                    if (segment.playScriptAfterVideo) {
+                        videoEl.loop = false; 
+                        videoEl.onended = () => {
+                            console.log("Video ended, playing script for: " + segment.title);
+                            playPandaScript(segment.pandaScript);
+                        };
+                    } else {
+                        playPandaScript(segment.pandaScript);
+                    }
+                }
+
+                videoEl.play().catch(error => {
+                    console.warn("Video autoplay with sound failed (browser policy might be blocking):", error);
+                    // No unmute button to prompt, user might experience silent video.
+                });
+                 
+                if (segment.lyrics) { 
+                    const lyricsP = document.createElement('p');
+                    lyricsP.innerHTML = `<em>${segment.lyrics}</em>`;
+                    segmentContent.appendChild(lyricsP);
+                    if (segment.songAudioSrc) { // audioEnabled is true by default
+                        const songAudio = new Audio(segment.songAudioSrc);
+                        songAudio.play().catch(e=>console.warn("Song audio play failed (browser policy might be blocking):", e));
+                    }
+                }
+
+            } else if (segment.type === "activity") {
+                html += `<p>${segment.instruction}</p>`;
+                segmentContent.innerHTML = html;
+                if (segment.interaction === "tapPandas" && segment.pandaTaps) {
+                    dabdoubPandaDiv.onclick = () => showPandaSpeech('dabdoub', segment.pandaTaps[0].text, segment.pandaTaps[0].audioSrc);
+                    dabdoubaPandaDiv.onclick = () => showPandaSpeech('dabdouba', segment.pandaTaps[1].text, segment.pandaTaps[1].audioSrc);
+                }
+            } else if (segment.type === "game") {
+                html += `<p>${segment.instruction || ''}</p>`;
+                 if (segment.placeholderVisual) { 
+                    html += `<img src="${segment.placeholderVisual}" alt="${segment.title}" class="content-image">`;
+                }
+                segmentContent.innerHTML = html;
+
+                if (segment.items) { 
+                    segment.items.forEach(item => {
+                        const itemEl = document.createElement('button');
+                        itemEl.classList.add('learning-pod-item');
+                        itemEl.textContent = item.name;
+                        itemEl.onclick = () => {
+                            const randomPanda = Math.random() > 0.5 ? 'dabdoub' : 'dabdouba';
+                            showPandaSpeech(randomPanda, item.message, item.audioSrc);
+                        };
+                        interactiveArea.appendChild(itemEl);
+                    });
+                }
+                if (segment.actions) { 
+                    const danceButtonsDiv = document.createElement('div');
+                    danceButtonsDiv.classList.add('dance-buttons');
+                    segment.actions.forEach(action => {
+                        const btn = document.createElement('button');
+                        btn.classList.add('interactive-button');
+                        btn.textContent = action.name;
+                        btn.onclick = () => {
+                            const pandaToAnimateDiv = action.pandaAnim.includes('dabdoub') ? dabdoubPandaDiv : dabdoubaPandaDiv;
+                            const pandaToAnimateName = action.pandaAnim.includes('dabdoub') ? 'dabdoub' : 'dabdouba';
+                            pandaToAnimateDiv.style.transition = 'transform 0.3s ease';
+                            if (action.id === 'clap') {
+                                pandaToAnimateDiv.style.transform = 'rotate(10deg)';
+                                setTimeout(() => pandaToAnimateDiv.style.transform = 'rotate(-10deg)', 150);
+                                setTimeout(() => pandaToAnimateDiv.style.transform = 'rotate(0deg)', 300);
+                            } else if (action.id === 'jump') {
+                                pandaToAnimateDiv.style.transform = 'translateY(-20px)';
+                                setTimeout(() => pandaToAnimateDiv.style.transform = 'translateY(0px)', 300);
+                            } else if (action.id === 'spin') {
+                                pandaToAnimateDiv.style.transform = 'rotate(360deg)';
+                                setTimeout(() => pandaToAnimateDiv.style.transform = 'rotate(0deg)', 300);
+                            }
+                             showPandaSpeech(pandaToAnimateName, `أنا ${action.name}!`, action.audioSrc);
+                        };
+                        danceButtonsDiv.appendChild(btn);
+                    });
+                    interactiveArea.appendChild(danceButtonsDiv);
+                }
+
+            } else if (segment.type === "endLesson") {
+                html += `<p>${segment.message}</p>`;
+                 if (segment.placeholderVisual) {
+                    html += `<img src="${segment.placeholderVisual}" alt="Lesson Complete" class="content-image">`;
+                }
+                segmentContent.innerHTML = html;
+                if (segment.audioSrc) { // audioEnabled is true by default
+                    const endAudio = new Audio(segment.audioSrc);
+                    endAudio.play().catch(e => console.warn("End lesson audio failed (browser policy might be blocking):", e));
+                }
+                nextButton.textContent = "الدرس التالي (تجريبي)";
+            }
+        }
+
+        nextButton.addEventListener('click', () => {
+            const currentLesson = unit1Data.lessons[currentLessonIndex];
+            currentSegmentIndex++;
+            if (currentSegmentIndex >= currentLesson.segments.length) {
+                currentLessonIndex++;
+                currentSegmentIndex = 0;
+                if (currentLessonIndex >= unit1Data.lessons.length) {
+                    segmentContent.innerHTML = `<h2>🎉 لقد أكملت الوحدة الأولى! 🎉</h2> <p>أنت رائع!</p>`;
+                    interactiveArea.innerHTML = '';
+                    nextButton.classList.add('hidden');
+                    dabdoubSpeechBubble.classList.add('hidden');
+                    dabdoubaSpeechBubble.classList.add('hidden');
+                    // No unmute button to hide
+                    if(currentVideoElement) {
+                        currentVideoElement.onended = null;
+                        currentVideoElement.pause();
+                    }
+                    return;
+                }
+                 nextButton.textContent = "التالي »";
+            }
+            loadSegment();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM content loaded! Initializing lesson. Audio will attempt to play by default.");
+            loadSegment();
+        });
+
+    </script>
+</body>
+</html>
